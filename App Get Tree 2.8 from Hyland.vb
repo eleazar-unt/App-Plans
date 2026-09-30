@@ -1,3 +1,38 @@
+' Written By: Riley Flinn & Andrew Langford
+' Version: 2.8
+' Date Updated: 12/11/2019
+' Get values using AppGetTree(). This script uses AppGetTree to pull linking information from a browser window and maps it to the document keys.
+' this function passes the name of the screen and returns the tree and the tree nodes. treeInfo(0) contains the tree, and treeInfo(1) contains the nodes.
+' *************
+' INSTRUCTIONS:
+' *************
+' 1. Replace "*Host Application*" below with the window title of your host application.
+' 2. Paste this script in Field1 of the LearnMode Application Plan Designer window. Click the Test button. That should open Notepad with the accessibility data of the web page. Refer to https://community.hyland.com/gallery/items/60325-how-to-use-the-appgettree-vbscript-function-for-learnmode for full instructions on how to find an anchor in the output and return the value. Example is provided below.
+ 
+treeInfo = FindTreeGetNodes("*[coll18_demo]*")
+
+If treeInfo(0) <> "" Then
+
+	' FOR TESTING ONLY, write the tree to a text file and open it.
+	' for generating a tree ensure the following directory exists: "C:\temp\debout_0.txt"
+	' if this directory does not exist, then replace the string with a directory that does exist within the quotes.
+	Call debOut(treeInfo(0), "C:\temp\debout_0.txt")
+
+	' Find an anchor label in the output and return the value for that anchor. NOTE: direction to search, direction = 0: forward; direction = 1: backwards)
+	'capturedValue = GetValueFromAnchor(treeInfo(1), "YOUR ANCHOR TAG HERE", <+/- number of lines to desired value>,<direction 0 or 1>)
+
+	
+	' Example -- the two lines below will search for "Student ID" in the output, get the value that is two lines down, and then assign that to Field1.
+	' StudentID = GetValueFromAnchor(treeInfo(1), "Student ID", +2,0)
+	' Field1 = StudentID
+	
+	' To assign a value to a custom property, use the DocProperty array:
+	'DocProperty("CP NAME HERE") = variable
+
+End If
+
+
+
 ' DO NOT EDIT FUNCTIONS BELOW
 function GetValueFromAnchor(nodes, anchor, position, directon)
 	anchor_position = -1
