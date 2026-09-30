@@ -29,8 +29,108 @@ If treeInfo(0) <> "" Then
 	' To assign a value to a custom property, use the DocProperty array:
 	'DocProperty("CP NAME HERE") = variable
 
+
+	'This assigns values for the SCREEN IDENTIFIER HERE linking Screen
+	IF GetLinkingScreen() = "Create Tenure Data - Google Chrome" THEN
+	
+	' potential fix to test is GetLinkingScreen().ToLower.Contains("chrome") THEN....
+	
+		field1 = GetValueFromAnchor(treeInfo(1), "[Item ID]", 3)
+		field2 = GetValueFromAnchor(treeInfo(1), "[Name]", 5)
+		
+		
+		' This assigns the values to the Fields
+		' Folder = Field1
+		' Tab = Field2
+		' Field3 = Field3
+		' DocProperty("CP NAME HERE") = variable
+		Field1 = field1
+		Field2 = field2
+		
+	'This assigns values for the SCREEN IDENTIFIER HERE linking Screen
+	ELSE IF GetLinkingScreen() = "Create Tenure Data - Microsoft Edge" THEN
+
+		emplid = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 3)
+		employeename = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 5)
+		
+		
+		' This assigns the values to the Fields
+		' Folder = Field1
+		' Tab = Field2
+		' Field3 = Field3
+		' DocProperty("CP NAME HERE") = variable
+		Field1 = emplid
+		Field2 = employeename
+		Field4 = GradYear
+		
+	' NOTE: Firefox if picky about the "dash" that is used.  make sure you are using the "long"
+    '       version of the dash as seen below.  " - " is for Chrome/Edge, " — " is for Firefox. 
+	ELSE IF GetLinkingScreen() = "Create Tenure Data — Mozilla Firefox" THEN
+
+		' this uses "YOUR ANCHOR TAG HERE" as the anchor and indexes the capturedValue off this anchor tag.
+		emplid = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 4)
+		employeename = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 9)
+		
+				' This assigns the values to the Fields
+		' Folder = Field1
+		' Tab = Field2
+		' Field3 = Field3
+		' DocProperty("CP NAME HERE") = variable
+		Field1 = emplid
+		Field2 = employeename
+		
+		
+	' NOTE: For further linking screens, please add more if statements based on the ones listed above.
+	End If
+	End If
+	End If
+
+
 End If
 
+
+'IMAGING TEAM FUNCTIONS
+function GetValueFromNode(nodes, anchor, position)
+     anchor_position = -1
+     cursor = 0
+     for ln = LBound(nodes) to UBound(nodes)
+          If InStr(nodes(ln), anchor) > 0 Then
+               ' Found our anchor.
+               anchor_position = cursor
+               Exit For
+          End If
+          cursor = cursor + 1
+     next
+     If anchor_position = -1 Then
+          MsgBox("Could not find " & anchor & ".")
+     Else
+          GetValueFromNode = GetNodeValue(nodes(anchor_position + position))
+     End If
+end function
+
+' Function get the value of the node within the tree.
+function GetNodeValue(text)
+
+    'This gets the value within the "[]"
+	GetNodeValue = Mid(text, instr(text, "[") + 1, instr(text, "]") - instr(text, "[") - 1)
+	
+end function
+
+
+Function GetLinkingScreen()
+
+	' this uses "YOUR ANCHOR TAG HERE" as a anchor tag and indexes the linking screen based off this anchor tag.
+	linkingScreen = GetValueFromAnchor(treeInfo(1), "[System]", 8)
+
+	' SAMPLE: This parsing sample will split the identifier information at ever " " in the string then returns the pieces in an array.
+	' The value that we are trying to capture is located in the first element of the array (element 0).
+	' next the code will perform a replace the ":" character in the string located in element 0 of the array with an empty string and then assigns the value to our variable linkingScreen.
+	' EXAMPLE INPUT: "VOUM: TESTING"
+	' EXAMPLE OUTPUT: "VOUM"
+
+	GetLinkingScreen = linkingScreen
+
+End Function
 
 
 ' DO NOT EDIT FUNCTIONS BELOW
