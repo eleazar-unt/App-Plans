@@ -16,7 +16,7 @@ If treeInfo(0) <> "" Then
 	' FOR TESTING ONLY, write the tree to a text file and open it.
 	' for generating a tree ensure the following directory exists: "C:\temp\debout_0.txt"
 	' if this directory does not exist, then replace the string with a directory that does exist within the quotes.
-	Call debOut(treeInfo(0), "C:\temp\debout_0.txt")
+	'Call debOut(treeInfo(0), "C:\temp\debout_0.txt")
 
 	' Find an anchor label in the output and return the value for that anchor. NOTE: direction to search, direction = 0: forward; direction = 1: backwards)
 	'capturedValue = GetValueFromAnchor(treeInfo(1), "YOUR ANCHOR TAG HERE", <+/- number of lines to desired value>,<direction 0 or 1>)
@@ -31,9 +31,9 @@ If treeInfo(0) <> "" Then
 
 
 	'This assigns values for the SCREEN IDENTIFIER HERE linking Screen
-	IF GetLinkingScreen() = "Create Tenure Data - Google Chrome" THEN
+	IF DetermineBrowser() = "chrome" THEN
 	
-	' potential fix to test is GetLinkingScreen().ToLower.Contains("chrome") THEN....
+	' potential fix to test is DetermineBrowser().ToLower.Contains("chrome") THEN....
 	
 		field1 = GetValueFromAnchor(treeInfo(1), "[Item ID]", 3)
 		field2 = GetValueFromAnchor(treeInfo(1), "[Name]", 5)
@@ -48,7 +48,7 @@ If treeInfo(0) <> "" Then
 		Field2 = field2
 		
 	'This assigns values for the SCREEN IDENTIFIER HERE linking Screen
-	ELSE IF GetLinkingScreen() = "Create Tenure Data - Microsoft Edge" THEN
+	ELSE IF DetermineBrowser() = "edge" THEN
 
 		emplid = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 3)
 		employeename = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 5)
@@ -65,7 +65,7 @@ If treeInfo(0) <> "" Then
 		
 	' NOTE: Firefox if picky about the "dash" that is used.  make sure you are using the "long"
     '       version of the dash as seen below.  " - " is for Chrome/Edge, " — " is for Firefox. 
-	ELSE IF GetLinkingScreen() = "Create Tenure Data — Mozilla Firefox" THEN
+	ELSE IF DetermineBrowser() = "firefox" THEN
 
 		' this uses "YOUR ANCHOR TAG HERE" as the anchor and indexes the capturedValue off this anchor tag.
 		emplid = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 4)
@@ -116,19 +116,22 @@ function GetNodeValue(text)
 	
 end function
 
+' This uses the values from the System anchor to determine which browser is being used
+' @Return {String} firefox | edge | chrome (default)
+Function DetermineBrowser()
 
-Function GetLinkingScreen()
+	browserData = GetValueFromAnchor(treeInfo(1), "[System]", 8)
 
-	' this uses "YOUR ANCHOR TAG HERE" as a anchor tag and indexes the linking screen based off this anchor tag.
-	linkingScreen = GetValueFromAnchor(treeInfo(1), "[System]", 8)
+	Select Case True
+		Case InStr(1, browserData, "firefox", vbTextCompare) > 0
+			browser = "firefox"
+		Case InStr(1, browserData, "edge", vbTextCompare) > 0
+			browser = "edge"
+		Case Else
+			browser = "chrome" 'Chrome is the fallback
+	End Select
 
-	' SAMPLE: This parsing sample will split the identifier information at ever " " in the string then returns the pieces in an array.
-	' The value that we are trying to capture is located in the first element of the array (element 0).
-	' next the code will perform a replace the ":" character in the string located in element 0 of the array with an empty string and then assigns the value to our variable linkingScreen.
-	' EXAMPLE INPUT: "VOUM: TESTING"
-	' EXAMPLE OUTPUT: "VOUM"
-
-	GetLinkingScreen = linkingScreen
+	DetermineBrowser = browser
 
 End Function
 
