@@ -120,7 +120,7 @@ end function
 ' @Return {String} firefox | edge | chrome (default)
 Function DetermineBrowser()
 
-	browserData = GetValueFromAnchor(treeInfo(1), "[System]", 8)
+	browserData = GetValueFromAnchor(treeInfo(1), "[System]", 4, 0)
 
 	Select Case True
 		Case InStr(1, browserData, "firefox", vbTextCompare) > 0
