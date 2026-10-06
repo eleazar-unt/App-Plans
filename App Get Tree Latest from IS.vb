@@ -1,95 +1,76 @@
 ' Written By: Riley Flinn & Andrew Langford
-' Version: 2.8
-' Date Updated: 12/11/2019
-' Get values using AppGetTree(). This script uses AppGetTree to pull linking information from a browser window and maps it to the document keys.
-' this function passes the name of the screen and returns the tree and the tree nodes. treeInfo(0) contains the tree, and treeInfo(1) contains the nodes.
-' *************
-' INSTRUCTIONS:
-' *************
-' 1. Replace "*Host Application*" below with the window title of your host application.
-' 2. Paste this script in Field1 of the LearnMode Application Plan Designer window. Click the Test button. That should open Notepad with the accessibility data of the web page. Refer to https://community.hyland.com/gallery/items/60325-how-to-use-the-appgettree-vbscript-function-for-learnmode for full instructions on how to find an anchor in the output and return the value. Example is provided below.
- 
-treeInfo = FindTreeGetNodes("*[coll18_demo]*")
+' Version: 2.8 Variant 1 - with Imaging Services changes
+' Modified by: Jason Eleazar
+' Date Modified: 10/6/2026
+'
+' This script uses AppGetTree to pull linking information from a browser window and maps it to the document keys.
+' this function passes the name of the screen and returns the tree and the tree nodes. treeInfo(0) contains the 
+' tree, and treeInfo(1) contains the nodes.
+'
+'
+'--------------------------------------------------------
+' INSTRUCTIONS
+'--------------------------------------------------------
+' 1. Replace "*Host Application*" on line 18 below with the window title of your host application.
+' 2. Paste this script in Field1 of the LearnMode Application Plan Designer window and hit okay
+
+' LSPD > Records and Enrollment > Enroll Students > Student Milestones
+treeInfo = FindTreeGetNodes("*Example Page*")
+
 
 If treeInfo(0) <> "" Then
 
-	' FOR TESTING ONLY, write the tree to a text file and open it.
-	' for generating a tree ensure the following directory exists: "C:\temp\debout_0.txt"
-	' if this directory does not exist, then replace the string with a directory that does exist within the quotes.
-	'Call debOut(treeInfo(0), "C:\temp\debout_0.txt")
-
-	' Find an anchor label in the output and return the value for that anchor. NOTE: direction to search, direction = 0: forward; direction = 1: backwards)
-	'capturedValue = GetValueFromAnchor(treeInfo(1), "YOUR ANCHOR TAG HERE", <+/- number of lines to desired value>,<direction 0 or 1>)
-
-	
-	' Example -- the two lines below will search for "Student ID" in the output, get the value that is two lines down, and then assign that to Field1.
-	' StudentID = GetValueFromAnchor(treeInfo(1), "Student ID", +2,0)
-	' Field1 = StudentID
-	
-	' To assign a value to a custom property, use the DocProperty array:
-	'DocProperty("CP NAME HERE") = variable
+  'You should be calling debOuts from our browser script but if you need to call it from here:
+  'Call debOut(treeInfo(0), "C:\temp\debout_0.txt")
 
 
-	'This assigns values for the SCREEN IDENTIFIER HERE linking Screen
+  '-----------------------CHROME---------------------------
 	IF DetermineBrowser() = "chrome" THEN
 	
-	' potential fix to test is DetermineBrowser().ToLower.Contains("chrome") THEN....
+    Field1 = GetValueFromAnchor(treeInfo(1), "[Academic Institution]", -4, 1) 'emplid
+    Field2 = GetValueFromAnchor(treeInfo(1), "[Academic Institution]", -7, 1) 'name
+    'Field3 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+    'Field4 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+    'Field5 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1)
+    'DocProperty("CP NAME HERE") = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+		
+		
+  '-----------------------EDGE-----------------------------
+  ELSEIF DetermineBrowser() = "edge" THEN
+
+    Field1 = GetValueFromAnchor(treeInfo(1), "[Academic Institution]", -4, 1) 'emplid
+    Field2 = GetValueFromAnchor(treeInfo(1), "[Academic Institution]", -7, 1) 'name
+    'Field3 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+    'Field4 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+    'Field5 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1)
+    'DocProperty("CP NAME HERE") = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+		
+    
+  '-----------------------FIRE FOX--------------------------
+  ELSEIF DetermineBrowser() = "firefox" THEN
+
+    Field1 = GetValueFromAnchor(treeInfo(1), "[Academic Institution]", -7, 1) 'emplid
+    Field2 = GetValueFromAnchor(treeInfo(1), "[Academic Institution]", -9, 1) 'name
+    'Field3 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+    'Field4 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
+    'Field5 = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1)
+    'DocProperty("CP NAME HERE") = GetValueFromAnchor(treeInfo(1), "[debout anchor]", 1, 1) 
 	
-		field1 = GetValueFromAnchor(treeInfo(1), "[Item ID]", 3)
-		field2 = GetValueFromAnchor(treeInfo(1), "[Name]", 5)
-		
-		
-		' This assigns the values to the Fields
-		' Folder = Field1
-		' Tab = Field2
-		' Field3 = Field3
-		' DocProperty("CP NAME HERE") = variable
-		Field1 = field1
-		Field2 = field2
-		
-	'This assigns values for the SCREEN IDENTIFIER HERE linking Screen
-	ELSE IF DetermineBrowser() = "edge" THEN
+  
+  End If
 
-		emplid = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 3)
-		employeename = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 5)
-		
-		
-		' This assigns the values to the Fields
-		' Folder = Field1
-		' Tab = Field2
-		' Field3 = Field3
-		' DocProperty("CP NAME HERE") = variable
-		Field1 = emplid
-		Field2 = employeename
-		Field4 = GradYear
-		
-	' NOTE: Firefox if picky about the "dash" that is used.  make sure you are using the "long"
-    '       version of the dash as seen below.  " - " is for Chrome/Edge, " — " is for Firefox. 
-	ELSE IF DetermineBrowser() = "firefox" THEN
-
-		' this uses "YOUR ANCHOR TAG HERE" as the anchor and indexes the capturedValue off this anchor tag.
-		emplid = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 4)
-		employeename = GetValueFromAnchor(treeInfo(1), "[Empl ID]", 9)
-		
-				' This assigns the values to the Fields
-		' Folder = Field1
-		' Tab = Field2
-		' Field3 = Field3
-		' DocProperty("CP NAME HERE") = variable
-		Field1 = emplid
-		Field2 = employeename
-		
-		
-	' NOTE: For further linking screens, please add more if statements based on the ones listed above.
-	End If
-	End If
-	End If
 
 
 End If
 
-
+'--------------------------------------------------------
 'IMAGING TEAM FUNCTIONS
+'--------------------------------------------------------
+'
+' Some items in EIS we need are not just in an anchor position.  They are sometimes part
+' of the node value.  This gets the value of the node within the tree. 
+'
+' @Return {String}
 function GetValueFromNode(nodes, anchor, position)
      anchor_position = -1
      cursor = 0
@@ -108,15 +89,15 @@ function GetValueFromNode(nodes, anchor, position)
      End If
 end function
 
-' Function get the value of the node within the tree.
+' Called by GetValueFromNode to get the value within the "[]"
+'
+' @Return {String}
 function GetNodeValue(text)
-
-    'This gets the value within the "[]"
 	GetNodeValue = Mid(text, instr(text, "[") + 1, instr(text, "]") - instr(text, "[") - 1)
-	
 end function
 
 ' This uses the values from the System anchor to determine which browser is being used
+'
 ' @Return {String} firefox | edge | chrome (default)
 Function DetermineBrowser()
 
@@ -135,8 +116,33 @@ Function DetermineBrowser()
 
 End Function
 
+' This is the original GetValueFromAnchor() function from older versions of the script
+' which do not contain a directional system.  So you don't have to say up or down along
+' with the number of skips.  This is frankly easier for end users to use since it makes
+' better logical sense which is why we still use it. 
+function GetValueFromAnchorOrig(nodes, anchor, position)
+     anchor_position = -1
+     cursor = 0
+     for ln = LBound(nodes) to UBound(nodes)
+          If InStr(nodes(ln), anchor) > 0 Then
+               ' Found our anchor.
+               anchor_position = cursor
+               Exit For
+          End If
+          cursor = cursor + 1
+     next
+     If anchor_position = -1 Then
+          MsgBox("Could not find " & anchor & ".")
+     Else
+          GetValueFromAnchorOrig = GetValue(nodes(anchor_position + position))
+     End If
+end function
 
+
+'--------------------------------------------------------
+' HYLAND Version 2.8 Code 
 ' DO NOT EDIT FUNCTIONS BELOW
+'--------------------------------------------------------
 function GetValueFromAnchor(nodes, anchor, position, directon)
 	anchor_position = -1
 	cursor = 0
